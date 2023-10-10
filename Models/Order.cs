@@ -13,6 +13,6 @@ public class Order
 	public decimal Total { get; set; }
 	public int Rating { get; set; }
 	public Customer Customer { get; set; }
-	public OrderItem OrderItem { get; set; }
+	public List<Item> Items { get; set; }
 }
 

@@ -46,4 +46,59 @@ app.MapGet("api/items/{type}", (SIMPOSDbContext db, string type) =>
         .ToList();
 });
 
+//ORDER APIs
+app.MapGet("api/orders", (SIMPOSDbContext db) =>
+{
+    return db.Orders.ToList();
+});
+
+app.MapGet("api/orders/{id}", (SIMPOSDbContext db, int id) =>
+{
+    return db.Orders.Single(order => order.OrderId == id);
+});
+
+app.MapPost("api/orders", (SIMPOSDbContext db, Order order) =>
+{
+    try
+    {
+        db.Orders.Add(order);
+        db.SaveChanges();
+        return Results.Created($"api/orders/{order.OrderId}", order);
+    }
+    catch (DbUpdateException)
+    {
+        return Results.NotFound();
+    }
+});
+
+app.MapPut("/api/orders/{id}", (SIMPOSDbContext db, int id, Order order) =>
+{
+    Order orderToUpdate = db.Orders.SingleOrDefault(order => order.OrderId == id);
+    if (orderToUpdate == null)
+    {
+        return Results.NotFound();
+    }
+    orderToUpdate.Status = order.Status;
+    orderToUpdate.Type = order.Type;
+    orderToUpdate.PaymentType = order.PaymentType;
+    orderToUpdate.Total = order.Total;
+    orderToUpdate.Rating = order.Rating;
+
+    db.Update(orderToUpdate);
+    db.SaveChanges();
+    return Results.Ok(orderToUpdate);
+});
+
+app.MapDelete("/api/orders/{id}", (SIMPOSDbContext db, int id) =>
+{
+    Order order = db.Orders.SingleOrDefault(order => order.OrderId == id);
+    if (order == null)
+    {
+        return Results.NotFound();
+    }
+    db.Orders.Remove(order);
+    db.SaveChanges();
+    return Results.NoContent();
+});
+
 app.Run();
