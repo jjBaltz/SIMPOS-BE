@@ -101,4 +101,58 @@ app.MapDelete("/api/orders/{id}", (SIMPOSDbContext db, int id) =>
     return Results.NoContent();
 });
 
+//CUSTOMER APIs
+app.MapGet("api/customers", (SIMPOSDbContext db) =>
+{
+    return db.Customers.ToList();
+});
+
+app.MapGet("api/custoemrs/{id}", (SIMPOSDbContext db, int id) =>
+{
+    return db.Customers.Single(customer => customer.CustomerId == id);
+});
+
+app.MapPost("api/customers", (SIMPOSDbContext db, Customer customer) =>
+{
+    try
+    {
+        db.Customers.Add(customer);
+        db.SaveChanges();
+        return Results.Created($"api/customers/{customer.CustomerId}", customer);
+    }
+    catch (DbUpdateException)
+    {
+        return Results.NotFound();
+    }
+});
+
+app.MapPut("/api/customers/{id}", (SIMPOSDbContext db, int id, Customer customer) =>
+{
+    Customer customerToUpdate = db.Customers.SingleOrDefault(customer => customer.CustomerId == id);
+    if (customerToUpdate == null)
+    {
+        return Results.NotFound();
+    }
+    customerToUpdate.FirstName = customer.FirstName;
+    customerToUpdate.LastName = customer.LastName;
+    customerToUpdate.Email = customer.Email;
+    customerToUpdate.PhoneNumber = customer.PhoneNumber;
+
+    db.Update(customerToUpdate);
+    db.SaveChanges();
+    return Results.Ok(customerToUpdate);
+});
+
+app.MapDelete("/api/customers/{id}", (SIMPOSDbContext db, int id) =>
+{
+    Customer customer = db.Customers.SingleOrDefault(customer => customer.CustomerId == id);
+    if (customer == null)
+    {
+        return Results.NotFound();
+    }
+    db.Customers.Remove(customer);
+    db.SaveChanges();
+    return Results.NoContent();
+});
+
 app.Run();
