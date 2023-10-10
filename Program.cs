@@ -156,3 +156,8 @@ app.MapDelete("/api/customers/{id}", (SIMPOSDbContext db, int id) =>
 });
 
 app.Run();
+
+
+// this is just a test to see how the merging into main is working
+
+
