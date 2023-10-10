@@ -155,9 +155,22 @@ app.MapDelete("/api/customers/{id}", (SIMPOSDbContext db, int id) =>
     return Results.NoContent();
 });
 
+//USER APIs
+app.MapGet("/api/checkuser/{uid}", (SIMPOSDbContext db, string uid) =>
+{
+    var userExist = db.Users.Where(user => user.UID == uid).ToList();
+    if (userExist == null)
+    {
+        return Results.NotFound();
+    }
+    return Results.Ok(userExist);
+});
+
+app.MapPost("/api/register", (SIMPOSDbContext db, User user) =>
+{
+    db.Users.Add(user);
+    db.SaveChanges();
+    return Results.Created($"/api/user/{user.UID}", user);
+});
+
 app.Run();
-
-
-// this is just a test to see how the merging into main is working
-
-
