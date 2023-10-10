@@ -33,4 +33,17 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+//ITEMS APIs
+app.MapGet("/api/items", (SIMPOSDbContext db) =>
+{
+    return db.Items.ToList();
+});
+
+app.MapGet("api/items/{type}", (SIMPOSDbContext db, string type) =>
+{
+    return db.Items
+        .Where(i => i.Type == type)
+        .ToList();
+});
+
 app.Run();
