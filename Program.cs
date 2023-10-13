@@ -3,7 +3,23 @@ using Microsoft.EntityFrameworkCore;
 using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Http.Json;
 
+var DefaultCors = "_DefaultCors";
+
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(name: DefaultCors,
+
+        policy =>
+        {
+            policy.WithOrigins("http://localhost:3000",
+                                "http://localhost:7033")
+                                .AllowAnyHeader()
+                                .AllowAnyMethod()
+                                .AllowAnyOrigin();
+        });
+});
 
 // allows passing datetimes without time zone data 
 AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
@@ -170,7 +186,12 @@ app.MapPost("/api/register", (SIMPOSDbContext db, User user) =>
 {
     db.Users.Add(user);
     db.SaveChanges();
-    return Results.Created($"/api/user/{user.UID}", user);
+    return Results.Created($"/api/user/user.Id", user);
+});
+
+app.MapGet("/api/users", (SIMPOSDbContext db) =>
+{
+    return db.Users.ToList();
 });
 
 app.Run();
