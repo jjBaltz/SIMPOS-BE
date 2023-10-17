@@ -63,6 +63,38 @@ app.MapGet("api/items/{type}", (SIMPOSDbContext db, string type) =>
         .ToList();
 });
 
+app.MapPost("api/orderitem/{orderId}/{itemId}", (SIMPOSDbContext db, int orderId, int itemId) =>
+{
+    OrderItem orderItem = new OrderItem()
+    {
+        OrderId = orderId,
+        ItemId = itemId,
+    };
+
+    try
+    {
+        db.OrderItems.Add(orderItem);
+        db.SaveChanges();
+        return Results.Ok(orderItem);
+    }
+    catch (DbUpdateException)
+    {
+        return Results.NotFound();
+    }
+});
+
+app.MapDelete("api/orderitem/{id}", (SIMPOSDbContext db, int id) =>
+{
+    OrderItem orderItem = db.OrderItems.SingleOrDefault(oi => oi.OrderItemId == id);
+    if (orderItem == null)
+    {
+        return Results.NotFound();
+    }
+    db.OrderItems.Remove(orderItem);
+    db.SaveChanges();
+    return Results.NoContent();
+});
+
 //ORDER APIs
 app.MapGet("api/orders", (SIMPOSDbContext db) =>
 {
@@ -124,7 +156,7 @@ app.MapGet("api/customers", (SIMPOSDbContext db) =>
     return db.Customers.ToList();
 });
 
-app.MapGet("api/custoemrs/{id}", (SIMPOSDbContext db, int id) =>
+app.MapGet("api/customers/{id}", (SIMPOSDbContext db, int id) =>
 {
     return db.Customers.Single(customer => customer.CustomerId == id);
 });
