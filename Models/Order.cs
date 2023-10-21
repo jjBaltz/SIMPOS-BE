@@ -10,9 +10,9 @@ public class Order
 	public bool Status { get; set; }
 	public string? Type { get; set; }
 	public string? PaymentType { get; set; }
-	public decimal? Total { get; set; }
 	public int? Rating { get; set; }
 	public Customer Customer { get; set; }
 	public List<Item> Items { get; set; }
+	public decimal? Total { get; set; }
 }
 

@@ -103,7 +103,9 @@ app.MapGet("api/orders", (SIMPOSDbContext db) =>
 
 app.MapGet("api/orders/{id}", (SIMPOSDbContext db, int id) =>
 {
-    return db.Orders.Single(order => order.OrderId == id);
+    return db.Orders
+        .Include(order => order.Customer)
+        .Single(order => order.OrderId == id);
 });
 
 app.MapPost("api/orders", (SIMPOSDbContext db, Order order) =>
@@ -158,16 +160,18 @@ app.MapGet("api/customers", (SIMPOSDbContext db) =>
 
 app.MapGet("api/customers/{id}", (SIMPOSDbContext db, int id) =>
 {
-    return db.Customers.Single(customer => customer.CustomerId == id);
+    return db.Customers
+        .Include(customer => customer.Orders)
+        .Single(customer => customer.CustomerId == id);
 });
 
-app.MapPost("api/customers", (SIMPOSDbContext db, Customer customer) =>
+app.MapPost("/api/customers", (SIMPOSDbContext db, Customer customer) =>
 {
     try
     {
         db.Customers.Add(customer);
         db.SaveChanges();
-        return Results.Created($"api/customers/{customer.CustomerId}", customer);
+        return Results.Created($"/api/customers/{customer.CustomerId}", customer);
     }
     catch (DbUpdateException)
     {
